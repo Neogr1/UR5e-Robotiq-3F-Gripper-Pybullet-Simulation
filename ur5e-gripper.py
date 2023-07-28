@@ -125,7 +125,11 @@ def get_gripper_joint_angles(rPOA,rPOB,rPOC,rPOS,rICF):
 
 
 
-
+'''
+--- SET MODE ---
+PALM_FREE: can control all DOFs
+PALM_DOWN: always keep the palm facing down. fixed as Rx=0 and Ry=pi/2
+'''
 mode = PALM_FREE
 # mode = PALM_DOWN
 
