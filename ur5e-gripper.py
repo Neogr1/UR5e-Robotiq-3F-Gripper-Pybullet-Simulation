@@ -33,14 +33,6 @@ def load_urdfs():
     robotId = p.loadURDF("ur5e-gripper.urdf", basePosition=[0,0,0], baseOrientation=[0,0,0,1])
     objectId = p.loadURDF(os.path.join(urdfRootPath, "random_urdfs/000/000.urdf"), basePosition=[0.5,0,0.1])
 
-    # boxColId = p.createCollisionShape(p.GEOM_BOX, halfExtents=[0.02,0.15,0.02])
-    # boxVisId = p.createVisualShape(p.GEOM_BOX,  halfExtents=[0.02,0.15,0.02])
-    # boxBodyId = p.createMultiBody(baseMass=0.1,
-    #                                 baseCollisionShapeIndex=boxColId,
-    #                                 baseVisualShapeIndex=boxVisId,
-    #                                 basePosition=[0.5,0,0.1],
-    # )
-
 def add_sliders():
     global x_slider,y_slider,z_slider,rx_slider,ry_slider,rz_slider,rPOA_slider,rPOB_slider,rPOC_slider,rPOS_slider,rICF_slider
     x_slider = p.addUserDebugParameter("X", 0, 1, 0.5)
@@ -87,8 +79,9 @@ def get_ur5_joint_angles(x,y,z,rx,ry,rz):
     quaternion = p.getQuaternionFromEuler(orientation)
 
     joint_angles = p.calculateInverseKinematics(
-        robotId, endEffectorLinkIndex=END_LINK_AS_WRIST,
-        # robotId, endEffectorLinkIndex=END_LINK_AS_PALM,
+        robotId,
+        endEffectorLinkIndex=END_LINK_AS_WRIST,
+        # endEffectorLinkIndex=END_LINK_AS_PALM,
         targetPosition=position, targetOrientation=quaternion, 
         upperLimits=UPPER, lowerLimits=LOWER,
         jointRanges=JOINT_RANGES, restPoses=REST
@@ -133,21 +126,27 @@ PALM_DOWN: always keep the palm facing down. fixed as Rx=0 and Ry=pi/2
 mode = PALM_FREE
 # mode = PALM_DOWN
 
-p.connect(p.GUI)
-p.setRealTimeSimulation(True)
-p.setGravity(0, 0, -9.81)
+if __name__ == "__main__":
+    p.connect(p.GUI)
+    p.setRealTimeSimulation(True)
+    p.setGravity(0, 0, -9.81)
 
-load_urdfs()
-add_sliders()
+    load_urdfs()
+    add_sliders()
 
-while 1:
-    x,y,z,rx,ry,rz,rPOA,rPOB,rPOC,rPOS,rICF = read_sliders()
+    # print("\n\n\n")
+    # for i in range(12):
+    #     print(i, p.getJointInfo(robotId, i)[1])
+    # print("\n\n\n")
 
-    ur5_joint_angles = get_ur5_joint_angles(x,y,z,rx,ry,rz)[:6]
-    gripper_joint_angles = get_gripper_joint_angles(rPOA,rPOB,rPOC,rPOS,rICF)
- 
-    p.setJointMotorControlArray(robotId, UR5_INDICES, p.POSITION_CONTROL, targetPositions=ur5_joint_angles)
-    p.setJointMotorControlArray(robotId, GRIPPER_INDICES, p.POSITION_CONTROL, targetPositions=gripper_joint_angles)
+    while 1:
+        x,y,z,rx,ry,rz,rPOA,rPOB,rPOC,rPOS,rICF = read_sliders()
 
-    p.stepSimulation()
-    time.sleep(0.1)
+        ur5_joint_angles = get_ur5_joint_angles(x,y,z,rx,ry,rz)[:6]
+        gripper_joint_angles = get_gripper_joint_angles(rPOA,rPOB,rPOC,rPOS,rICF)
+    
+        p.setJointMotorControlArray(robotId, UR5_INDICES, p.POSITION_CONTROL, targetPositions=ur5_joint_angles)
+        p.setJointMotorControlArray(robotId, GRIPPER_INDICES, p.POSITION_CONTROL, targetPositions=gripper_joint_angles)
+
+        p.stepSimulation()
+        time.sleep(0.1)

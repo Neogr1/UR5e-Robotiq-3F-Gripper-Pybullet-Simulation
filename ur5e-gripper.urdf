@@ -209,7 +209,7 @@
   <joint name="ee_fixed_joint" type="fixed">
     <parent link="wrist_3_link"/>
     <child link="ee_link"/>
-    <origin rpy="0.0 0.0 1.57079632679" xyz="0.0 0.1 0.0"/>
+    <origin rpy="0.0 0.0 1.57079632679" xyz="0.0 0.1 0.0"/> <!-- modify the y value to adjust the gap between manipulator and gripper-->
   </joint>
   <link name="ee_link">
     <visual>
